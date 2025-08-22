@@ -29,11 +29,16 @@
     "build:electron": "tsc -p electron/tsconfig.json",
     "electron": "electron dist/electron/main.js",
     "dist": "electron-builder",
-    "dist:win": "electron-builder --win",
+    "dist:win": "electron-builder --win --x64",
+    "dist:portable": "electron-builder --win --x64 --config.win.target=portable",
+    "dist:installer": "electron-builder --win --x64 --config.win.target=nsis",
     "dist:mac": "electron-builder --mac",
     "dist:linux": "electron-builder --linux",
-    "package": "npm run build && npm run dist",
-    "release": "npm run build && npm run dist --publish=always"
+    "package": "npm run build && npm run dist:portable",
+    "package:installer": "npm run build && npm run dist:installer",
+    "package:win": "npm run build && electron-packager . DarpanUno --platform=win32 --arch=x64 --out=dist/packager --overwrite --app-copyright='Copyright (C) 2024 Darpan Uno' --app-version=2.0.0",
+    "release": "npm run build && npm run dist --publish=always",
+    "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [
     "arduino",
@@ -55,25 +60,22 @@
     "concurrently": "^8.2.2",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
+    "electron-packager": "^17.1.2",
     "typescript": "^5.3.3",
     "vite": "^5.0.8"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@monaco-editor/react": "^4.6.0",
-    "@serialport/parser-readline": "^12.0.0",
     "@types/uuid": "^9.0.7",
     "chokidar": "^3.5.3",
     "diff": "^5.1.0",
     "marked": "^11.1.1",
     "monaco-editor": "^0.45.0",
-    "monaco-languageclient": "^7.3.0",
     "openai": "^4.20.1",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "serialport": "^12.0.0",
-    "sqlite3": "^5.1.6",
     "uuid": "^9.0.1"
   },
   "build": {
@@ -112,16 +114,13 @@
     "win": {
       "target": [
         {
-          "target": "nsis",
-          "arch": ["x64"]
-        },
-        {
-          "target": "zip",
-          "arch": ["x64"]
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
         }
       ],
-      "icon": "renderer/public/darpan-uno-logo.svg",
-      "artifactName": "${productName}-setup-${version}.${ext}",
+      "artifactName": "${productName}-${version}-${arch}",
       "publisherName": "Dayanand Darpan"
     },
     "nsis": {
@@ -138,7 +137,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "icon": "renderer/public/darpan-uno-logo.svg",
@@ -149,11 +151,15 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "deb",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "renderer/public/darpan-uno-logo.svg",
