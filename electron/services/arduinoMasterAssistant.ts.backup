@@ -1,0 +1,689 @@
+import { EventEmitter } from 'events';
+import { TerminalExecutor } from './terminalExecutor';
+import { EnhancedArduinoCLI } from './enhancedArduinoCLI';
+import { DeviceManager } from './deviceManager';
+import { EnhancedSerialManager } from './enhancedSerial';
+import { ArduinoAutoFixer } from './arduinoAutoFixer';
+import { ArduinoKnowledgeBase } from './arduinoKnowledgeBase';
+import ArduinoSmartToolEngine, { SmartToolRequest, SmartToolResponse } from './arduinoSmartToolEngine';
+import { ReferenceManager } from './referenceManager';
+import { AIHardwareRecognition } from './aiHardwareRecognition';
+import ArduinoPromptEngine from './arduinoPromptEngine';
+
+interface QuickAction {
+  id: string;
+  name: string;
+  description: string;
+  category: 'sensor' | 'actuator' | 'communication' | 'display' | 'project' | 'learning';
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  estimatedTime: string;
+  tags: string[];
+  prompt?: string;
+  defaultContext?: any;
+}
+
+interface ToolSuggestion {
+  toolName: string;
+  description: string;
+  useCase: string;
+  confidence: number;
+  estimatedBenefit: string;
+}
+
+export interface ToolbeltRequest {
+  type: 'execute' | 'compile' | 'upload' | 'analyze' | 'fix' | 'learn' | 'simulate';
+  target?: string;
+  code?: string;
+  board?: string;
+  port?: string;
+  library?: string;
+  component?: string;
+  context?: any;
+}
+
+export interface ToolbeltResponse {
+  success: boolean;
+  data?: any;
+  error?: string;
+  suggestions?: string[];
+  nextSteps?: string[];
+  confidence?: number;
+}
+
+export interface AgentCapability {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  complexity: 'basic' | 'intermediate' | 'advanced' | 'expert';
+  tools: string[];
+  estimatedTime: string;
+}
+
+export interface ToolbeltTool {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  service: string;
+  method: string;
+  parameters: any[];
+  examples: string[];
+}
+
+/**
+ * Arduino Master Assistant - Orchestrates the complete Arduino Agent Toolbelt
+ * Integrates all toolbelt services into a unified intelligent development agent
+ */
+export class ArduinoMasterAssistant extends EventEmitter {
+  // Core Toolbelt Services
+  private terminalExecutor: TerminalExecutor;
+  private arduinoCLI: EnhancedArduinoCLI;
+  private deviceManager: DeviceManager;
+  private serialManager: EnhancedSerialManager;
+  private autoFixer: ArduinoAutoFixer;
+  private knowledgeBase: ArduinoKnowledgeBase;
+  
+  // Legacy Services (will integrate)
+  private smartEngine: ArduinoSmartToolEngine;
+  private referenceManager: ReferenceManager;
+  private hardwareRecognition: AIHardwareRecognition;
+  private promptEngine: ArduinoPromptEngine;
+  
+  // Agent State
+  private capabilities: Map<string, AgentCapability> = new Map();
+  private tools: Map<string, ToolbeltTool> = new Map();
+  private quickActions: Map<string, QuickAction> = new Map();
+  private activeProject: string | null = null;
+  private isInitialized: boolean = false;
+
+  constructor() {
+    super();
+    this.referenceManager = new ReferenceManager('');
+    this.hardwareRecognition = new AIHardwareRecognition(this.referenceManager);
+    this.smartEngine = new ArduinoSmartToolEngine(this.referenceManager);
+    this.promptEngine = new ArduinoPromptEngine();
+    
+    this.initializeQuickActions();
+    this.setupEventHandlers();
+  }
+
+  private initializeQuickActions(): void {
+    const actions: QuickAction[] = [
+      // Beginner Quick Actions
+      {
+        id: 'blink-led',
+        name: 'Blink LED',
+        description: 'Create a simple LED blinking program',
+        category: 'learning',
+        difficulty: 'beginner',
+        estimatedTime: '15 minutes',
+        tags: ['led', 'basic', 'first-project'],
+        prompt: 'Create a simple Arduino program to blink an LED connected to pin 13 every 1 second',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'beginner',
+          outputFormat: 'tutorial',
+          projectContext: {
+            projectType: 'educational',
+            targetBoard: 'arduino-uno',
+            experienceLevel: 'beginner'
+          }
+        }
+      },
+      {
+        id: 'button-input',
+        name: 'Button Input',
+        description: 'Read button state and control LED',
+        category: 'sensor',
+        difficulty: 'beginner',
+        estimatedTime: '30 minutes',
+        tags: ['button', 'input', 'digital'],
+        prompt: 'Create Arduino code to read a button and turn on an LED when pressed',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'beginner',
+          outputFormat: 'tutorial'
+        }
+      },
+      {
+        id: 'temperature-sensor',
+        name: 'Temperature Monitor',
+        description: 'Read temperature with DHT22 sensor',
+        category: 'sensor',
+        difficulty: 'intermediate',
+        estimatedTime: '45 minutes',
+        tags: ['temperature', 'dht22', 'sensor'],
+        prompt: 'Create a temperature monitoring system using DHT22 sensor with serial output',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'intermediate',
+          outputFormat: 'comprehensive'
+        }
+      },
+      {
+        id: 'servo-control',
+        name: 'Servo Control',
+        description: 'Control servo motor position',
+        category: 'actuator',
+        difficulty: 'intermediate',
+        estimatedTime: '30 minutes',
+        tags: ['servo', 'motor', 'control'],
+        prompt: 'Create Arduino code to control a servo motor with smooth movement',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'intermediate',
+          outputFormat: 'code'
+        }
+      },
+      {
+        id: 'wifi-iot',
+        name: 'WiFi IoT Device',
+        description: 'Connect ESP32 to WiFi and send sensor data',
+        category: 'communication',
+        difficulty: 'advanced',
+        estimatedTime: '2 hours',
+        tags: ['wifi', 'iot', 'esp32', 'cloud'],
+        prompt: 'Create an IoT device using ESP32 that connects to WiFi and sends sensor data to a web server',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'advanced',
+          outputFormat: 'comprehensive',
+          projectContext: {
+            projectType: 'iot-project',
+            targetBoard: 'esp32'
+          }
+        }
+      },
+      {
+        id: 'lcd-display',
+        name: 'LCD Display',
+        description: 'Show data on 16x2 LCD screen',
+        category: 'display',
+        difficulty: 'intermediate',
+        estimatedTime: '45 minutes',
+        tags: ['lcd', 'display', 'i2c'],
+        prompt: 'Create Arduino code to display sensor readings on a 16x2 LCD with I2C interface',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'intermediate',
+          outputFormat: 'tutorial'
+        }
+      },
+      {
+        id: 'ultrasonic-distance',
+        name: 'Distance Sensor',
+        description: 'Measure distance with HC-SR04',
+        category: 'sensor',
+        difficulty: 'intermediate',
+        estimatedTime: '30 minutes',
+        tags: ['ultrasonic', 'distance', 'hc-sr04'],
+        prompt: 'Create a distance measurement system using HC-SR04 ultrasonic sensor',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'intermediate',
+          outputFormat: 'code'
+        }
+      },
+      {
+        id: 'home-automation',
+        name: 'Smart Home System',
+        description: 'Multi-sensor home automation project',
+        category: 'project',
+        difficulty: 'expert',
+        estimatedTime: '1 week',
+        tags: ['home-automation', 'multiple-sensors', 'system'],
+        prompt: 'Design a smart home automation system with temperature, motion, and light sensors',
+        defaultContext: {
+          requestType: 'project-planning',
+          targetAudience: 'expert',
+          outputFormat: 'comprehensive',
+          projectContext: {
+            projectType: 'home-automation'
+          }
+        }
+      },
+      {
+        id: 'robot-car',
+        name: 'Robot Car',
+        description: 'Autonomous robot car with obstacle avoidance',
+        category: 'project',
+        difficulty: 'advanced',
+        estimatedTime: '3-5 days',
+        tags: ['robotics', 'autonomous', 'motors', 'sensors'],
+        prompt: 'Create an autonomous robot car with obstacle avoidance using ultrasonic sensors and motors',
+        defaultContext: {
+          requestType: 'project-planning',
+          targetAudience: 'advanced',
+          outputFormat: 'comprehensive',
+          projectContext: {
+            projectType: 'robotics'
+          }
+        }
+      },
+      {
+        id: 'data-logger',
+        name: 'Data Logger',
+        description: 'Multi-sensor data logging system',
+        category: 'project',
+        difficulty: 'advanced',
+        estimatedTime: '2-3 days',
+        tags: ['data-logging', 'sd-card', 'sensors'],
+        prompt: 'Create a data logging system that records multiple sensor readings to SD card with timestamps',
+        defaultContext: {
+          requestType: 'code-generation',
+          targetAudience: 'advanced',
+          outputFormat: 'comprehensive'
+        }
+      }
+    ];
+
+    actions.forEach(action => {
+      this.quickActions.set(action.id, action);
+    });
+
+    console.log(`Loaded ${this.quickActions.size} quick actions`);
+  }
+
+  private setupEventHandlers(): void {
+    this.smartEngine.on('request-received', (request) => {
+      this.emit('processing-started', { type: 'smart-request', data: request });
+    });
+
+    this.smartEngine.on('response-generated', (response) => {
+      this.emit('processing-completed', { type: 'smart-response', data: response });
+    });
+
+    this.hardwareRecognition.on('recognition-complete', (results) => {
+      this.emit('hardware-recognized', results);
+    });
+  }
+
+  // Main interface for handling user requests
+  async handleUserRequest(
+    query: string,
+    context?: {
+      experienceLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+      preferredFormat?: 'code' | 'tutorial' | 'comprehensive';
+      projectType?: string;
+      targetBoard?: string;
+    }
+  ): Promise<SmartToolResponse> {
+    this.emit('user-request', { query, context });
+
+    // Analyze the request to determine the best approach
+    const requestAnalysis = await this.analyzeUserRequest(query, context);
+    
+    // Check if there's a quick action that matches
+    const quickAction = this.findMatchingQuickAction(query);
+    
+    if (quickAction && requestAnalysis.confidence > 0.8) {
+      return await this.executeQuickAction(quickAction.id, query);
+    }
+
+    // Use the smart engine for complex requests
+    const smartRequest: SmartToolRequest = {
+      userQuery: query,
+      projectContext: {
+        experienceLevel: context?.experienceLevel || 'intermediate',
+        targetBoard: context?.targetBoard as any || 'arduino-uno',
+        projectType: this.inferProjectType(query),
+        programmingLanguage: 'arduino-c',
+        communicationProtocols: this.extractCommunicationProtocols(query),
+        powerRequirements: this.inferPowerRequirements(query),
+        environmentalConditions: this.inferEnvironment(query)
+      },
+      requestType: requestAnalysis.requestType,
+      targetAudience: context?.experienceLevel || 'intermediate',
+      outputFormat: context?.preferredFormat || 'comprehensive'
+    };
+
+    return await this.smartEngine.processSmartRequest(smartRequest);
+  }
+
+  // Quick Actions interface
+  async executeQuickAction(actionId: string, customQuery?: string): Promise<SmartToolResponse> {
+    const action = this.quickActions.get(actionId);
+    if (!action) {
+      throw new Error(`Quick action '${actionId}' not found`);
+    }
+
+    this.emit('quick-action-started', { actionId, action });
+
+    const request: SmartToolRequest = {
+      userQuery: customQuery || action.prompt,
+      requestType: action.defaultContext.requestType || 'code-generation',
+      targetAudience: action.defaultContext.targetAudience || 'intermediate',
+      outputFormat: action.defaultContext.outputFormat || 'comprehensive',
+      projectContext: action.defaultContext.projectContext || {
+        experienceLevel: 'intermediate',
+        targetBoard: 'arduino-uno',
+        projectType: 'educational'
+      }
+    };
+
+    const response = await this.smartEngine.processSmartRequest(request);
+    
+    this.emit('quick-action-completed', { actionId, response });
+    return response;
+  }
+
+  getAllQuickActions(): QuickAction[] {
+    return Array.from(this.quickActions.values());
+  }
+
+  getQuickActionsByCategory(category: QuickAction['category']): QuickAction[] {
+    return Array.from(this.quickActions.values()).filter(action => action.category === category);
+  }
+
+  getQuickActionsByDifficulty(difficulty: QuickAction['difficulty']): QuickAction[] {
+    return Array.from(this.quickActions.values()).filter(action => action.difficulty === difficulty);
+  }
+
+  searchQuickActions(query: string): QuickAction[] {
+    const queryLower = query.toLowerCase();
+    return Array.from(this.quickActions.values()).filter(action =>
+      action.name.toLowerCase().includes(queryLower) ||
+      action.description.toLowerCase().includes(queryLower) ||
+      action.tags.some(tag => tag.toLowerCase().includes(queryLower))
+    );
+  }
+
+  // Hardware Recognition interface
+  async recognizeHardware(description: string): Promise<any[]> {
+    return await this.hardwareRecognition.recognizeFromDescription(description);
+  }
+
+  async recognizeHardwareFromImage(imageData: Buffer | string): Promise<any[]> {
+    return await this.hardwareRecognition.recognizeFromImage(imageData);
+  }
+
+  async suggestComponents(requirements: any): Promise<any[]> {
+    return await this.hardwareRecognition.suggestComponents(requirements);
+  }
+
+  // Learning and Reference interface
+  async getReference(topic: string): Promise<any> {
+    return await this.referenceManager.searchReferences(topic);
+  }
+
+  async getContextualHelp(code: string, cursorPosition: number): Promise<any> {
+    return await this.referenceManager.getContextualHelp(code);
+  }
+
+  // Tool Suggestions
+  async suggestTools(query: string, context?: any): Promise<ToolSuggestion[]> {
+    const suggestions: ToolSuggestion[] = [];
+    const queryLower = query.toLowerCase();
+
+    // Analyze query for tool recommendations
+    if (queryLower.includes('component') || queryLower.includes('part') || queryLower.includes('hardware')) {
+      suggestions.push({
+        toolName: 'Hardware Recognition',
+        description: 'AI-powered component identification and selection',
+        useCase: 'When you need help identifying or selecting the right components',
+        confidence: 0.9,
+        estimatedBenefit: 'Save 1-2 hours of research time'
+      });
+    }
+
+    if (queryLower.includes('code') || queryLower.includes('program') || queryLower.includes('sketch')) {
+      suggestions.push({
+        toolName: 'Smart Code Generator',
+        description: 'AI-assisted Arduino code generation with best practices',
+        useCase: 'When you need clean, documented code for your project',
+        confidence: 0.95,
+        estimatedBenefit: 'Generate production-ready code in minutes'
+      });
+    }
+
+    if (queryLower.includes('project') || queryLower.includes('plan') || queryLower.includes('design')) {
+      suggestions.push({
+        toolName: 'Project Planner',
+        description: 'Comprehensive project planning and workflow management',
+        useCase: 'When starting a new project or organizing complex builds',
+        confidence: 0.85,
+        estimatedBenefit: 'Reduce project risk and improve success rate'
+      });
+    }
+
+    if (queryLower.includes('learn') || queryLower.includes('tutorial') || queryLower.includes('help')) {
+      suggestions.push({
+        toolName: 'Learning Assistant',
+        description: 'Personalized learning paths and tutorials',
+        useCase: 'When you want to learn new concepts or improve skills',
+        confidence: 0.8,
+        estimatedBenefit: 'Accelerate learning with structured guidance'
+      });
+    }
+
+    if (queryLower.includes('debug') || queryLower.includes('fix') || queryLower.includes('problem')) {
+      suggestions.push({
+        toolName: 'Troubleshooting Wizard',
+        description: 'Systematic problem diagnosis and solution finder',
+        useCase: 'When your project isn\'t working as expected',
+        confidence: 0.9,
+        estimatedBenefit: 'Quickly identify and resolve issues'
+      });
+    }
+
+    if (queryLower.includes('optimize') || queryLower.includes('improve') || queryLower.includes('performance')) {
+      suggestions.push({
+        toolName: 'Optimization Engine',
+        description: 'Performance and efficiency optimization recommendations',
+        useCase: 'When you need to improve code or system performance',
+        confidence: 0.85,
+        estimatedBenefit: 'Significantly improve project performance'
+      });
+    }
+
+    // Sort by confidence
+    suggestions.sort((a, b) => b.confidence - a.confidence);
+    
+    return suggestions.slice(0, 5); // Return top 5 suggestions
+  }
+
+  // Utility methods
+  private async analyzeUserRequest(query: string, context?: any): Promise<{
+    requestType: SmartToolRequest['requestType'];
+    confidence: number;
+    inferredContext: any;
+  }> {
+    const queryLower = query.toLowerCase();
+    let requestType: SmartToolRequest['requestType'] = 'code-generation';
+    let confidence = 0.5;
+
+    // Determine request type based on keywords
+    if (queryLower.includes('component') || queryLower.includes('part') || queryLower.includes('select')) {
+      requestType = 'component-selection';
+      confidence = 0.8;
+    } else if (queryLower.includes('plan') || queryLower.includes('design') || queryLower.includes('architecture')) {
+      requestType = 'project-planning';
+      confidence = 0.8;
+    } else if (queryLower.includes('debug') || queryLower.includes('fix') || queryLower.includes('problem') || queryLower.includes('error')) {
+      requestType = 'troubleshooting';
+      confidence = 0.9;
+    } else if (queryLower.includes('learn') || queryLower.includes('teach') || queryLower.includes('explain')) {
+      requestType = 'learning';
+      confidence = 0.8;
+    } else if (queryLower.includes('optimize') || queryLower.includes('improve') || queryLower.includes('faster')) {
+      requestType = 'optimization';
+      confidence = 0.8;
+    } else if (queryLower.includes('code') || queryLower.includes('program') || queryLower.includes('write')) {
+      requestType = 'code-generation';
+      confidence = 0.9;
+    }
+
+    return {
+      requestType,
+      confidence,
+      inferredContext: context || {}
+    };
+  }
+
+  private findMatchingQuickAction(query: string): QuickAction | null {
+    const queryLower = query.toLowerCase();
+    
+    for (const action of this.quickActions.values()) {
+      // Check if query matches action keywords
+      const matchScore = this.calculateActionMatchScore(queryLower, action);
+      if (matchScore > 0.7) {
+        return action;
+      }
+    }
+    
+    return null;
+  }
+
+  private calculateActionMatchScore(query: string, action: QuickAction): number {
+    let score = 0;
+    
+    // Check name match
+    if (query.includes(action.name.toLowerCase())) {
+      score += 0.5;
+    }
+    
+    // Check tag matches
+    action.tags.forEach(tag => {
+      if (query.includes(tag.toLowerCase())) {
+        score += 0.3;
+      }
+    });
+    
+    // Check description keywords
+    const descWords = action.description.toLowerCase().split(' ');
+    descWords.forEach(word => {
+      if (word.length > 3 && query.includes(word)) {
+        score += 0.1;
+      }
+    });
+    
+    return Math.min(score, 1.0);
+  }
+
+  private inferProjectType(query: string): any {
+    const queryLower = query.toLowerCase();
+    
+    if (queryLower.includes('robot') || queryLower.includes('motor') || queryLower.includes('movement')) {
+      return 'robotics';
+    } else if (queryLower.includes('iot') || queryLower.includes('wifi') || queryLower.includes('internet')) {
+      return 'iot-project';
+    } else if (queryLower.includes('home') || queryLower.includes('automation') || queryLower.includes('smart')) {
+      return 'home-automation';
+    } else if (queryLower.includes('sensor') || queryLower.includes('measure') || queryLower.includes('detect')) {
+      return 'sensor-project';
+    } else if (queryLower.includes('wearable') || queryLower.includes('watch') || queryLower.includes('fitness')) {
+      return 'wearable';
+    } else if (queryLower.includes('industrial') || queryLower.includes('control') || queryLower.includes('factory')) {
+      return 'industrial';
+    } else if (queryLower.includes('learn') || queryLower.includes('education') || queryLower.includes('tutorial')) {
+      return 'educational';
+    }
+    
+    return 'prototyping';
+  }
+
+  private extractCommunicationProtocols(query: string): string[] {
+    const protocols: string[] = [];
+    const queryLower = query.toLowerCase();
+    
+    if (queryLower.includes('wifi')) protocols.push('WiFi');
+    if (queryLower.includes('bluetooth')) protocols.push('Bluetooth');
+    if (queryLower.includes('serial')) protocols.push('Serial');
+    if (queryLower.includes('i2c')) protocols.push('I2C');
+    if (queryLower.includes('spi')) protocols.push('SPI');
+    if (queryLower.includes('can')) protocols.push('CAN');
+    if (queryLower.includes('modbus')) protocols.push('Modbus');
+    if (queryLower.includes('ethernet')) protocols.push('Ethernet');
+    
+    return protocols.length > 0 ? protocols : ['Serial'];
+  }
+
+  private inferPowerRequirements(query: string): any {
+    const queryLower = query.toLowerCase();
+    
+    if (queryLower.includes('battery') || queryLower.includes('portable')) {
+      return 'battery';
+    } else if (queryLower.includes('solar')) {
+      return 'solar';
+    } else if (queryLower.includes('wall') || queryLower.includes('plug') || queryLower.includes('adapter')) {
+      return 'wall-adapter';
+    } else if (queryLower.includes('low power') || queryLower.includes('sleep')) {
+      return 'low-power';
+    }
+    
+    return 'usb';
+  }
+
+  private inferEnvironment(query: string): any {
+    const queryLower = query.toLowerCase();
+    
+    if (queryLower.includes('outdoor') || queryLower.includes('weather') || queryLower.includes('rain')) {
+      return 'outdoor';
+    } else if (queryLower.includes('harsh') || queryLower.includes('industrial') || queryLower.includes('extreme')) {
+      return 'harsh';
+    } else if (queryLower.includes('marine') || queryLower.includes('boat') || queryLower.includes('water')) {
+      return 'marine';
+    } else if (queryLower.includes('car') || queryLower.includes('vehicle') || queryLower.includes('automotive')) {
+      return 'automotive';
+    }
+    
+    return 'indoor';
+  }
+
+  // Public methods for integration
+  async generateWiringDiagram(components: string[]): Promise<string> {
+    return await this.hardwareRecognition.generateWiringDiagram(components);
+  }
+
+  async analyzeCircuitComplexity(components: string[]): Promise<any> {
+    return await this.hardwareRecognition.analyzeCircuitComplexity(components);
+  }
+
+  // Get system status and capabilities
+  getSystemCapabilities(): {
+    quickActions: number;
+    templates: number;
+    workflows: number;
+    components: number;
+  } {
+    return {
+      quickActions: this.quickActions.size,
+      templates: this.promptEngine.getAllTemplates().length,
+      workflows: this.promptEngine.getAllWorkflows().length,
+      components: this.hardwareRecognition.getAllComponents().length
+    };
+  }
+
+  // Health check
+  async healthCheck(): Promise<{
+    status: 'healthy' | 'degraded' | 'error';
+    components: Record<string, boolean>;
+    lastUpdated: string;
+  }> {
+    const components = {
+      smartEngine: true,
+      hardwareRecognition: true,
+      promptEngine: true,
+      referenceManager: true
+    };
+
+    // Basic functionality tests
+    try {
+      await this.promptEngine.getAllTemplates();
+      await this.hardwareRecognition.getAllComponents();
+    } catch (error) {
+      components.smartEngine = false;
+    }
+
+    const allHealthy = Object.values(components).every(status => status);
+    
+    return {
+      status: allHealthy ? 'healthy' : 'degraded',
+      components,
+      lastUpdated: new Date().toISOString()
+    };
+  }
+}
+
+export default ArduinoMasterAssistant;

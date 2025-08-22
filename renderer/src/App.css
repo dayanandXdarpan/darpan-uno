@@ -1,0 +1,217 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global scrollbar hiding with hover reveal */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* WebKit browsers */
+}
+
+/* Show scrollbars on hover for better accessibility */
+*:hover {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(108, 108, 108, 0.3) transparent;
+}
+
+*:hover::-webkit-scrollbar {
+  display: block;
+  width: 4px;
+  height: 4px;
+}
+
+*:hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(108, 108, 108, 0.3);
+  border-radius: 2px;
+}
+
+*:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(108, 108, 108, 0.6);
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #1e1e1e;
+  color: #cccccc;
+  /* Prevent text selection lag and improve performance */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Allow text selection in specific areas */
+.message-content,
+.monaco-editor,
+input,
+textarea,
+pre,
+code {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+.App {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Ensure clean background */
+  background: #1e1e1e;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hide any background content and improve performance */
+.app-content {
+  position: relative;
+  z-index: 2;
+  background: #1e1e1e;
+  width: 100%;
+  height: 100%;
+}
+
+/* Offline mode text alignment fixes */
+.offline-text,
+.connection-status,
+.status-message {
+  text-align: center;
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: normal;
+  /* Fix any text shifting issues */
+  transform: translateZ(0);
+  will-change: auto;
+}
+
+/* Fix for any content shifts */
+.content-container {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+
+/* Loading Screen */
+.app-loading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e1e1e 0%, #2d2d30 100%);
+  color: #cccccc;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 40px;
+  border-radius: 12px;
+  background: rgba(45, 45, 48, 0.8);
+  border: 1px solid #404040;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.arduino-logo {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.loading-container h2 {
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #404040;
+  border-top: 3px solid #0066cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+.loading-container p {
+  color: #a0a0a0;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.connection-status {
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 500;
+  user-select: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Global scrollbar styles */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+::-webkit-scrollbar-corner {
+  background: #1e1e1e;
+}
+
+/* Selection styles */
+::selection {
+  background-color: #0e639c;
+  color: white;
+}
+
+/* Focus styles */
+*:focus {
+  outline: 2px solid #0e639c;
+  outline-offset: -2px;
+}
+
+button:focus,
+select:focus,
+input:focus,
+textarea:focus {
+  outline: 1px solid #0e639c;
+  outline-offset: 1px;
+}

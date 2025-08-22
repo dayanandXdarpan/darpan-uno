@@ -1,0 +1,368 @@
+.circuit-builder {
+  display: flex;
+  height: 100vh;
+  background: #f5f5f5;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.circuit-toolbar {
+  width: 300px;
+  background: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.component-palette {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.component-palette h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.component-item {
+  padding: 8px 12px;
+  margin: 4px 0;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.component-item:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.component-item:active {
+  cursor: grabbing;
+}
+
+.circuit-actions {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.circuit-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #007acc;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.circuit-actions button:hover:not(:disabled) {
+  background: #005a9e;
+}
+
+.circuit-actions button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.circuit-canvas-container {
+  flex: 1;
+  position: relative;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.circuit-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+}
+
+.connection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.components-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.circuit-component {
+  min-width: 100px;
+  min-height: 60px;
+  background: #ffffff;
+  border: 2px solid #333;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.circuit-component:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.circuit-component.selected {
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.3);
+}
+
+.circuit-component.arduino {
+  background: #2c5f41;
+  color: white;
+  width: 120px;
+  height: 80px;
+}
+
+.circuit-component.led {
+  background: linear-gradient(45deg, #ff6b6b, #ff5252);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.circuit-component.resistor {
+  background: #f4e4c1;
+  border-color: #8b4513;
+  width: 60px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.circuit-component.button {
+  background: #e0e0e0;
+  border-color: #666;
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+}
+
+.circuit-component.sensor {
+  background: #4a90e2;
+  color: white;
+  width: 80px;
+  height: 60px;
+}
+
+.component-body {
+  padding: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.component-name {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.component-pins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  justify-content: center;
+}
+
+.pin {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.pin:hover {
+  transform: scale(1.5);
+}
+
+.pin.digital {
+  background: #4CAF50;
+}
+
+.pin.analog {
+  background: #FF9800;
+}
+
+.pin.power {
+  background: #F44336;
+}
+
+.pin.ground {
+  background: #000000;
+}
+
+.pin.input {
+  border: 2px solid #333;
+}
+
+.pin.output {
+  border: 2px solid #666;
+}
+
+.pin.bidirectional {
+  border: 2px dashed #999;
+}
+
+.pin-label {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  white-space: nowrap;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 1px 3px;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.pin:hover .pin-label {
+  opacity: 1;
+}
+
+.connection-wire {
+  transition: stroke 0.2s ease;
+  cursor: pointer;
+}
+
+.connection-wire:hover {
+  stroke-width: 3;
+}
+
+.validation-panel {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 3;
+}
+
+.validation-panel h4 {
+  margin: 0 0 8px 0;
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+.validation-panel ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.validation-issue {
+  color: #d32f2f;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .circuit-builder {
+    flex-direction: column;
+  }
+  
+  .circuit-toolbar {
+    width: 100%;
+    height: 200px;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .component-palette {
+    flex: 1;
+    border-bottom: none;
+    border-right: 1px solid #e0e0e0;
+  }
+  
+  .circuit-actions {
+    width: 150px;
+  }
+  
+  .validation-panel {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin: 16px;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .circuit-builder {
+    background: #1e1e1e;
+  }
+  
+  .circuit-toolbar {
+    background: #2d2d30;
+    border-right-color: #3e3e42;
+  }
+  
+  .component-palette {
+    border-bottom-color: #3e3e42;
+  }
+  
+  .component-palette h3 {
+    color: #cccccc;
+  }
+  
+  .component-item {
+    background: #3c3c3c;
+    border-color: #555555;
+    color: #cccccc;
+  }
+  
+  .component-item:hover {
+    background: #4a4a4a;
+  }
+  
+  .circuit-canvas {
+    background: #1e1e1e;
+    border-color: #3e3e42;
+  }
+  
+  .circuit-component {
+    background: #2d2d30;
+    border-color: #cccccc;
+    color: #cccccc;
+  }
+  
+  .validation-panel {
+    background: #2d2d30;
+    border-color: #3e3e42;
+    color: #cccccc;
+  }
+}

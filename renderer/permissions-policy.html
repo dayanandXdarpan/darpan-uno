@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Permissions-Policy" content="
+        camera=(*),
+        microphone=(*),
+        geolocation=(*),
+        usb=(*),
+        serial=(*),
+        bluetooth=(*),
+        gyroscope=(*),
+        accelerometer=(*),
+        magnetometer=(*),
+        ambient-light-sensor=(*),
+        display-capture=(*),
+        clipboard-read=(*),
+        clipboard-write=(*),
+        storage-access=(*),
+        fullscreen=(*),
+        payment=(),
+        picture-in-picture=(),
+        autoplay=(),
+        encrypted-media=(),
+        midi=(*),
+        notifications=(*)
+    ">
+    <title>Arduino AI IDE - Permissions Policy</title>
+</head>
+<body>
+    <h1>Arduino AI IDE Permissions</h1>
+    <p>This file defines the permissions policy for the Arduino AI IDE application.</p>
+    
+    <h2>Granted Permissions:</h2>
+    <ul>
+        <li><strong>Serial API</strong> - For Arduino board communication</li>
+        <li><strong>USB API</strong> - For direct USB device access</li>
+        <li><strong>Bluetooth</strong> - For wireless Arduino boards</li>
+        <li><strong>Camera/Microphone</strong> - For AI-powered debugging features</li>
+        <li><strong>Clipboard</strong> - For copy/paste functionality</li>
+        <li><strong>Fullscreen</strong> - For distraction-free coding</li>
+        <li><strong>Notifications</strong> - For build/upload status alerts</li>
+        <li><strong>File System</strong> - For project management</li>
+        <li><strong>Geolocation</strong> - For location-based Arduino projects</li>
+        <li><strong>Sensors</strong> - For sensor simulation and testing</li>
+    </ul>
+    
+    <h2>Security Notes:</h2>
+    <ul>
+        <li>Permissions are restricted to Arduino development use cases</li>
+        <li>External content is sandboxed for security</li>
+        <li>Only Arduino-related domains are allowed for external requests</li>
+        <li>All permissions can be revoked by the user at any time</li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,610 @@
+import { EventEmitter } from 'events';
+import { TerminalExecutor } from './terminalExecutor';
+import { EnhancedArduinoCLI, ArduinoCompileResult, ArduinoUploadResult } from './enhancedArduinoCLI';
+import { DeviceManager } from './deviceManager';
+import { EnhancedSerialManager } from './enhancedSerial';
+import { ArduinoAutoFixer } from './arduinoAutoFixer';
+import { ArduinoKnowledgeBase } from './arduinoKnowledgeBase';
+import ArduinoSmartToolEngine, { SmartToolRequest, SmartToolResponse } from './arduinoSmartToolEngine';
+import { ReferenceManager } from './referenceManager';
+import { AIHardwareRecognition } from './aiHardwareRecognition';
+import ArduinoPromptEngine from './arduinoPromptEngine';
+
+interface FixResult {
+  success: boolean;
+  fixes: string[];
+  confidence: number;
+  remainingIssues?: string[];
+}
+
+export interface ToolbeltRequest {
+  type: 'execute' | 'compile' | 'upload' | 'analyze' | 'fix' | 'learn' | 'simulate';
+  target?: string;
+  code?: string;
+  board?: string;
+  port?: string;
+  library?: string;
+  component?: string;
+  context?: any;
+}
+
+export interface ToolbeltResponse {
+  success: boolean;
+  data?: any;
+  error?: string;
+  suggestions?: string[];
+  nextSteps?: string[];
+  confidence?: number;
+}
+
+export interface AgentCapability {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  complexity: 'basic' | 'intermediate' | 'advanced' | 'expert';
+  tools: string[];
+  estimatedTime: string;
+}
+
+export interface ToolbeltTool {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  service: string;
+  method: string;
+  parameters: any[];
+  examples: string[];
+}
+
+/**
+ * Arduino Master Assistant - Orchestrates the complete Arduino Agent Toolbelt
+ * Integrates all toolbelt services into a unified intelligent development agent
+ */
+export class ArduinoMasterAssistant extends EventEmitter {
+  // Core Toolbelt Services
+  private terminalExecutor: TerminalExecutor;
+  private arduinoCLI: EnhancedArduinoCLI;
+  private deviceManager: DeviceManager;
+  private serialManager: EnhancedSerialManager;
+  private autoFixer: ArduinoAutoFixer;
+  private knowledgeBase: ArduinoKnowledgeBase;
+  
+  // Legacy Services (will integrate)
+  private smartEngine: ArduinoSmartToolEngine;
+  private referenceManager: ReferenceManager;
+  private hardwareRecognition: AIHardwareRecognition;
+  private promptEngine: ArduinoPromptEngine;
+  
+  // Agent State
+  private capabilities: Map<string, AgentCapability> = new Map();
+  private tools: Map<string, ToolbeltTool> = new Map();
+  private activeProject: string | null = null;
+  private isInitialized: boolean = false;
+
+  constructor() {
+    super();
+    
+    // Initialize core toolbelt services
+    this.terminalExecutor = new TerminalExecutor();
+    this.arduinoCLI = new EnhancedArduinoCLI();
+    this.deviceManager = new DeviceManager();
+    this.serialManager = new EnhancedSerialManager();
+    this.autoFixer = new ArduinoAutoFixer(this.arduinoCLI);
+    this.knowledgeBase = new ArduinoKnowledgeBase();
+    
+    // Initialize legacy services
+    this.referenceManager = new ReferenceManager('');
+    this.hardwareRecognition = new AIHardwareRecognition(this.referenceManager);
+    this.smartEngine = new ArduinoSmartToolEngine(this.referenceManager);
+    this.promptEngine = new ArduinoPromptEngine();
+    
+    this.initializeToolbelt();
+    this.setupEventHandlers();
+  }
+
+  private async initializeToolbelt(): Promise<void> {
+    try {
+      console.log('🔧 Initializing Arduino Agent Toolbelt...');
+      
+      // Register all capabilities and tools
+      await this.registerCapabilities();
+      await this.registerTools();
+      
+      // Setup inter-service communication
+      this.setupServiceIntegration();
+      
+      this.isInitialized = true;
+      this.emit('initialized');
+      console.log('✅ Arduino Agent Toolbelt initialized successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to initialize toolbelt:', error);
+      this.emit('error', error);
+    }
+  }
+
+  private async registerCapabilities(): Promise<void> {
+    const capabilities: AgentCapability[] = [
+      // Part A: Terminal Execution & Commands
+      {
+        id: 'terminal-execution',
+        name: 'Terminal Command Execution',
+        description: 'Execute any terminal command with streaming output and pattern matching',
+        category: 'infrastructure',
+        complexity: 'basic',
+        tools: ['run', 'expect', 'parseOutput', 'killProcess'],
+        estimatedTime: '1-5 seconds'
+      },
+      
+      // Part D: Arduino CLI Integration
+      {
+        id: 'arduino-cli',
+        name: 'Arduino CLI Operations',
+        description: 'Complete Arduino CLI wrapper with enhanced parsing and error handling',
+        category: 'development',
+        complexity: 'intermediate',
+        tools: ['compile', 'upload', 'boardList', 'libInstall', 'sketchCreate'],
+        estimatedTime: '5-30 seconds'
+      },
+      
+      // Part E: Device Management
+      {
+        id: 'device-management',
+        name: 'Hardware Device Detection',
+        description: 'Intelligent device identification and port management',
+        category: 'hardware',
+        complexity: 'advanced',
+        tools: ['identify', 'reset', 'bootloader', 'portScan', 'firmwareDetect'],
+        estimatedTime: '2-10 seconds'
+      },
+      
+      // Part F: Serial I/O & Telemetry
+      {
+        id: 'serial-communication',
+        name: 'Advanced Serial Communication',
+        description: 'Pattern matching, data logging, and sensor data parsing',
+        category: 'communication',
+        complexity: 'intermediate',
+        tools: ['open', 'expect', 'record', 'parseSensor', 'export'],
+        estimatedTime: '1-60 seconds'
+      },
+      
+      // Part K: Error Recovery
+      {
+        id: 'auto-recovery',
+        name: 'Intelligent Error Recovery',
+        description: 'Automatic error detection, diagnosis, and fixing',
+        category: 'intelligence',
+        complexity: 'expert',
+        tools: ['diagnose', 'fix', 'retry', 'suggest', 'learn'],
+        estimatedTime: '5-120 seconds'
+      },
+      
+      // Part I: Knowledge Base
+      {
+        id: 'knowledge-base',
+        name: 'Component Knowledge System',
+        description: 'Comprehensive database of components, datasheets, and code templates',
+        category: 'knowledge',
+        complexity: 'basic',
+        tools: ['search', 'datasheet', 'pinout', 'template', 'recommend'],
+        estimatedTime: '1-5 seconds'
+      },
+      
+      // Integrated Capabilities
+      {
+        id: 'full-project-workflow',
+        name: 'Complete Project Development',
+        description: 'End-to-end project creation, compilation, upload, and monitoring',
+        category: 'workflow',
+        complexity: 'expert',
+        tools: ['create', 'develop', 'test', 'deploy', 'monitor'],
+        estimatedTime: '2-10 minutes'
+      }
+    ];
+
+    capabilities.forEach(cap => this.capabilities.set(cap.id, cap));
+    console.log(`📋 Registered ${capabilities.length} agent capabilities`);
+  }
+
+  private async registerTools(): Promise<void> {
+    const tools: ToolbeltTool[] = [
+      // Terminal Execution Tools
+      {
+        id: 'execute-command',
+        name: 'Execute Terminal Command',
+        description: 'Run any terminal command with streaming output',
+        category: 'terminal',
+        service: 'terminalExecutor',
+        method: 'run',
+        parameters: ['command', 'options'],
+        examples: ['arduino-cli version', 'dir /b *.ino']
+      },
+      
+      // Arduino CLI Tools
+      {
+        id: 'compile-sketch',
+        name: 'Compile Arduino Sketch',
+        description: 'Compile sketch with enhanced error parsing',
+        category: 'arduino',
+        service: 'arduinoCLI',
+        method: 'compile',
+        parameters: ['sketchPath', 'board', 'options'],
+        examples: ['sketch.ino', 'arduino:avr:uno']
+      },
+      
+      // Device Management Tools
+      {
+        id: 'identify-device',
+        name: 'Identify Connected Device',
+        description: 'Detect and identify Arduino boards via VID/PID',
+        category: 'hardware',
+        service: 'deviceManager',
+        method: 'identify',
+        parameters: ['port'],
+        examples: ['COM3', '/dev/ttyUSB0']
+      },
+      
+      // Serial Communication Tools
+      {
+        id: 'serial-monitor',
+        name: 'Advanced Serial Monitor',
+        description: 'Monitor serial with pattern matching and logging',
+        category: 'communication',
+        service: 'serialManager',
+        method: 'open',
+        parameters: ['port', 'baudrate', 'options'],
+        examples: ['COM3', '9600']
+      },
+      
+      // Auto Recovery Tools
+      {
+        id: 'auto-fix',
+        name: 'Automatic Error Fixing',
+        description: 'Intelligently fix compilation and upload errors',
+        category: 'intelligence',
+        service: 'autoFixer',
+        method: 'diagnoseAndFix',
+        parameters: ['error', 'context'],
+        examples: ['compilation error', 'upload failure']
+      },
+      
+      // Knowledge Base Tools
+      {
+        id: 'component-lookup',
+        name: 'Component Information Lookup',
+        description: 'Get datasheets, pinouts, and usage examples',
+        category: 'knowledge',
+        service: 'knowledgeBase',
+        method: 'getComponent',
+        parameters: ['componentName'],
+        examples: ['ESP32', 'DHT22', 'servo']
+      }
+    ];
+
+    tools.forEach(tool => this.tools.set(tool.id, tool));
+    console.log(`🔨 Registered ${tools.length} toolbelt tools`);
+  }
+
+  private setupServiceIntegration(): void {
+    // Auto-fixer integration with Arduino CLI
+    this.arduinoCLI.on('compilationError', async (error) => {
+      console.log('🔧 Auto-fixing compilation error...');
+      // TODO: Implement fixCompilationError method
+      // const fix = await this.autoFixer.fixCompilationError(error);
+      if (fix.success) {
+        this.emit('autoFixApplied', fix);
+      }
+    });
+
+    // Device manager integration with serial manager
+    this.deviceManager.on('deviceDetected', async (device) => {
+      console.log(`📱 Device detected: ${device.board} on ${device.port}`);
+      // Auto-suggest serial monitoring
+      this.emit('deviceSuggestion', {
+        action: 'monitor',
+        device: device,
+        suggestion: 'Start serial monitoring?'
+      });
+    });
+
+    // Knowledge base integration
+    this.knowledgeBase.on?.('componentAnalyzed', (analysis) => {
+      this.emit('knowledgeUpdate', analysis);
+    });
+  }
+
+  private setupEventHandlers(): void {
+    // Forward important events
+    this.terminalExecutor.on('commandComplete', (result) => {
+      this.emit('terminalResult', result);
+    });
+
+    this.arduinoCLI.on('uploadComplete', (result) => {
+      this.emit('uploadComplete', result);
+      if (result.success) {
+        // Auto-suggest serial monitoring
+        this.emit('suggestion', {
+          type: 'serial',
+          message: 'Upload successful! Start serial monitoring?',
+          action: 'startSerial'
+        });
+      }
+    });
+
+    this.serialManager.on('dataReceived', (data) => {
+      this.emit('serialData', data);
+    });
+  }
+
+  // Public API Methods
+
+  /**
+   * Execute a high-level toolbelt request
+   */
+  async execute(request: ToolbeltRequest): Promise<ToolbeltResponse> {
+    try {
+      if (!this.isInitialized) {
+        await this.initializeToolbelt();
+      }
+
+      console.log(`🚀 Executing ${request.type} request:`, request);
+
+      switch (request.type) {
+        case 'compile':
+          return await this.handleCompileRequest(request);
+        case 'upload':
+          return await this.handleUploadRequest(request);
+        case 'analyze':
+          return await this.handleAnalyzeRequest(request);
+        case 'fix':
+          return await this.handleFixRequest(request);
+        case 'learn':
+          return await this.handleLearnRequest(request);
+        default:
+          return {
+            success: false,
+            error: `Unknown request type: ${request.type}`,
+            suggestions: ['Try: compile, upload, analyze, fix, learn']
+          };
+      }
+    } catch (error) {
+      console.error('❌ Toolbelt execution error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        suggestions: ['Check your request parameters', 'Try a simpler operation first']
+      };
+    }
+  }
+
+  private async handleCompileRequest(request: ToolbeltRequest): Promise<ToolbeltResponse> {
+    if (!request.code && !request.target) {
+      return {
+        success: false,
+        error: 'Code or target file required for compilation',
+        suggestions: ['Provide code content or target file path']
+      };
+    }
+
+    const result = await this.arduinoCLI.compile(
+      request.target || 'temp_sketch',
+      request.board || 'arduino:avr:uno'
+    );
+
+    if (!result.returns.success && result.returns.errors.length > 0) {
+      // Auto-attempt fixing include path errors
+      const fix = await this.autoFixer.fixIncludePaths(
+        request.target || 'temp_sketch', 
+        result.returns.errors
+      );
+      if (fix.success) {
+        // Retry compilation
+        const retryResult = await this.arduinoCLI.compile(
+          request.target || 'temp_sketch',
+          request.board || 'arduino:avr:uno'
+        );
+        
+        return {
+          success: retryResult.returns.success,
+          data: retryResult,
+          suggestions: ['Auto-fix applied and compilation retried'],
+          confidence: fix.confidence
+        };
+      }
+    }
+
+    return {
+      success: result.returns.success,
+      data: result,
+      error: result.returns.stderr,
+      suggestions: result.returns.success ? 
+        ['Ready to upload to device'] : 
+        ['Check code syntax', 'Verify board selection', 'Install missing libraries']
+    };
+  }
+
+  private async handleUploadRequest(request: ToolbeltRequest): Promise<ToolbeltResponse> {
+    if (!request.target) {
+      return {
+        success: false,
+        error: 'Target sketch required for upload',
+        suggestions: ['Provide sketch path or compile first']
+      };
+    }
+
+    // Auto-detect device if port not specified
+    let port = request.port;
+    if (!port) {
+      const devices = await this.deviceManager.listDevices();
+      const detectedDevice = devices.find(d => d.isArduino);
+      if (detectedDevice) {
+        port = detectedDevice.port;
+        console.log(`📱 Auto-detected device on port: ${port}`);
+      }
+    }
+
+    if (!port) {
+      return {
+        success: false,
+        error: 'No Arduino device found',
+        suggestions: ['Connect Arduino device', 'Check USB cable', 'Install drivers']
+      };
+    }
+
+    const result = await this.arduinoCLI.upload(
+      request.target,
+      request.board || 'arduino:avr:uno',
+      port,
+      { verbose: true }
+    );
+
+    return {
+      success: result.success,
+      data: result,
+      error: result.error,
+      suggestions: result.success ? 
+        ['Upload complete! Start serial monitoring?'] : 
+        ['Check device connection', 'Verify board selection', 'Try resetting device'],
+      nextSteps: result.success ? ['serial_monitor', 'test_functionality'] : ['diagnose_upload']
+    };
+  }
+
+  private async handleAnalyzeRequest(request: ToolbeltRequest): Promise<ToolbeltResponse> {
+    const analysis: any = {
+      timestamp: new Date().toISOString(),
+      type: request.type
+    };
+
+    if (request.code) {
+      // Code analysis
+      analysis.codeMetrics = {
+        lines: request.code.split('\n').length,
+        functions: (request.code.match(/void\s+\w+\s*\(/g) || []).length,
+        includes: (request.code.match(/#include\s*[<"]\w+\.h[>"]/g) || []).length
+      };
+
+      // Component detection
+      const components = await this.knowledgeBase.detectComponents(request.code);
+      analysis.components = components;
+
+      // Suggestions based on analysis
+      const suggestions = [];
+      if (analysis.codeMetrics.includes === 0) {
+        suggestions.push('Consider adding library includes');
+      }
+      if (analysis.codeMetrics.functions < 2) {
+        suggestions.push('Consider adding helper functions');
+      }
+      if (components.sensors.length > 0) {
+        suggestions.push('Add sensor calibration routines');
+      }
+
+      return {
+        success: true,
+        data: analysis,
+        suggestions: suggestions,
+        confidence: 0.8
+      };
+    }
+
+    if (request.component) {
+      // Component analysis
+      const componentInfo = await this.knowledgeBase.getComponent(request.component);
+      return {
+        success: componentInfo !== null,
+        data: componentInfo,
+        suggestions: componentInfo ? 
+          ['View datasheet', 'Generate example code', 'Check pinout'] : 
+          ['Check component name spelling', 'Browse component categories']
+      };
+    }
+
+    return {
+      success: false,
+      error: 'No analysis target specified',
+      suggestions: ['Provide code or component name for analysis']
+    };
+  }
+
+  private async handleFixRequest(request: ToolbeltRequest): Promise<ToolbeltResponse> {
+    if (!request.context) {
+      return {
+        success: false,
+        error: 'Error context required for fixing',
+        suggestions: ['Provide error message or compilation output']
+      };
+    }
+
+    const fix = await this.autoFixer.diagnoseAndFix(request.context, { 
+      type: 'general',
+      code: request.code 
+    });
+
+    return {
+      success: fix.success,
+      data: fix,
+      error: fix.error,
+      suggestions: fix.suggestions || [],
+      confidence: fix.confidence
+    };
+  }
+
+  private async handleLearnRequest(request: ToolbeltRequest): Promise<ToolbeltResponse> {
+    if (request.component) {
+      const learning = await this.knowledgeBase.getLearningPath(request.component);
+      return {
+        success: true,
+        data: learning,
+        suggestions: ['Follow the learning path step by step', 'Try the example projects']
+      };
+    }
+
+    // General learning recommendations
+    const recommendations = await this.knowledgeBase.getRecommendations('beginner');
+    return {
+      success: true,
+      data: recommendations,
+      suggestions: ['Start with basic LED projects', 'Learn about sensors', 'Practice with examples']
+    };
+  }
+
+  // Utility Methods
+
+  getCapabilities(): AgentCapability[] {
+    return Array.from(this.capabilities.values());
+  }
+
+  getTools(): ToolbeltTool[] {
+    return Array.from(this.tools.values());
+  }
+
+  getToolsByCategory(category: string): ToolbeltTool[] {
+    return Array.from(this.tools.values()).filter(tool => tool.category === category);
+  }
+
+  isReady(): boolean {
+    return this.isInitialized;
+  }
+
+  getStatus(): any {
+    return {
+      initialized: this.isInitialized,
+      activeProject: this.activeProject,
+      capabilities: this.capabilities.size,
+      tools: this.tools.size,
+      services: {
+        terminal: this.terminalExecutor.constructor.name,
+        arduino: this.arduinoCLI.constructor.name,
+        device: this.deviceManager.constructor.name,
+        serial: this.serialManager.constructor.name,
+        autofix: this.autoFixer.constructor.name,
+        knowledge: this.knowledgeBase.constructor.name
+      }
+    };
+  }
+}
+
+export default ArduinoMasterAssistant;

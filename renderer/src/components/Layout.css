@@ -1,0 +1,1028 @@
+/* VS Code Layout Styling */
+.vscode-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  background-color: #1e1e1e;
+  color: #cccccc;
+  overflow: hidden;
+  position: relative;
+  /* CSS Variables for components */
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #252526;
+  --bg-tertiary: #2d2d30;
+  --bg-code: #0d1117;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #3e3e42;
+  --primary-color: #007acc;
+  --primary-hover: #1177bb;
+  --warning-color: #ff9500;
+  --info-color: #007acc;
+}
+
+/* Menu Bar Enhanced */
+.menu-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 35px;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 12px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1000;
+}
+
+.menu-title {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-logo {
+  height: 24px;
+  width: auto;
+  filter: brightness(1.1);
+}
+
+.app-name {
+  font-weight: 700;
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+.developer-badge {
+  background: linear-gradient(45deg, #00ff88, #00ffaa);
+  color: #1e1e1e;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 12px;
+  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+}
+
+.developer-info {
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.app-icon {
+  font-size: 16px;
+  color: #61dafb;
+}
+
+.menu-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.workspace-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.workspace-name {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.workspace-file {
+  color: #888;
+  font-style: italic;
+}
+
+.menu-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hardware-controls,
+.action-controls,
+.view-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.hardware-controls::after,
+.action-controls::after {
+  content: '';
+  width: 1px;
+  height: 20px;
+  background-color: var(--border-color);
+  margin-left: 6px;
+}
+
+.view-btn {
+  background: none;
+  border: none;
+  color: #969696;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  background-color: #3e3e42;
+  color: var(--text-secondary);
+}
+
+.view-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Panel Controls */
+.panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.panel-control-btn {
+  background: none;
+  border: none;
+  color: #969696;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.panel-control-btn:hover {
+  background-color: #3e3e42;
+  color: var(--text-secondary);
+}
+
+/* Tab System Enhanced */
+.tab-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.tab-actions {
+  display: flex;
+  gap: 2px;
+  margin-right: 8px;
+}
+
+.tab-action-btn {
+  background: none;
+  border: none;
+  color: #969696;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.tab-action-btn:hover {
+  background-color: #3e3e42;
+  color: var(--text-secondary);
+}
+
+/* Problems, Output, Terminal Panels */
+.problems-panel,
+.output-panel,
+.terminal-panel {
+  padding: 12px;
+  height: 100%;
+  overflow-y: auto;
+  font-family: 'Consolas', monospace;
+  font-size: 13px;
+}
+
+.panel-message {
+  color: #969696;
+  font-style: italic;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.output-content,
+.terminal-content {
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.terminal-content {
+  background-color: #0c0c0c;
+  color: #00ff00;
+  padding: 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Status indicators */
+.file-status {
+  color: #ff6b6b;
+  margin-left: 4px;
+  font-size: 12px;
+}
+
+/* Tooltip styles */
+[title] {
+  position: relative;
+}
+
+/* Enhanced responsiveness */
+@media (max-width: 1024px) {
+  .menu-center {
+    display: none;
+  }
+  
+  .hardware-controls {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-bar {
+    padding: 0 8px;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 35px;
+  }
+  
+  .menu-actions {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  
+  .view-controls {
+    order: -1;
+    width: 100%;
+    justify-content: flex-end;
+    margin-bottom: 4px;
+  }
+}
+
+/* Loading states */
+.panel-content.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: #969696;
+}
+
+.panel-content.loading::before {
+  content: '⏳ ';
+  margin-right: 8px;
+}
+
+/* Focus management */
+.vscode-layout:focus-within .resizer {
+  opacity: 1;
+}
+
+.resizer {
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.resizer:hover {
+  opacity: 1;
+}
+
+.board-select,
+.port-select {
+  background-color: #3c3c3c;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: 120px;
+  font-family: inherit;
+}
+
+.board-select:focus,
+.port-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.action-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 2px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.action-btn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.compile-btn {
+  background-color: #4a9c4a;
+}
+
+.compile-btn:hover {
+  background-color: #5db85d;
+}
+
+.upload-btn {
+  background-color: #d19a66;
+}
+
+.upload-btn:hover {
+  background-color: #e5b584;
+}
+
+.serial-btn {
+  background-color: #6a9bd1;
+}
+
+.serial-btn:hover {
+  background-color: #7ba6d7;
+}
+
+.serial-btn.connected {
+  background-color: #52c41a;
+}
+
+.serial-btn.connected:hover {
+  background-color: #73d13d;
+}
+
+/* Main Layout */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Panel Styling */
+.left-panel,
+.right-panel {
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-width: 200px;
+  max-width: 800px;
+}
+
+.right-panel {
+  border-right: none;
+  border-left: 1px solid var(--border-color);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 35px;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.panel-title {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel-close-btn {
+  background: none;
+  border: none;
+  color: #969696;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.panel-close-btn:hover {
+  background-color: #3e3e42;
+  color: var(--text-secondary);
+}
+
+.panel-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Panel Control Enhancements */
+.panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.panel-control-btn {
+  background: none;
+  border: none;
+  color: #969696;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.panel-control-btn:hover {
+  background-color: #3e3e42;
+  color: var(--text-secondary);
+}
+
+/* AI Chat Panel Optimizations */
+.panel-content.minimized {
+  height: 50px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  color: #888;
+  font-size: 11px;
+  border-top: 2px solid var(--primary-color);
+}
+
+.panel-content.minimized::before {
+  content: "🤖 AI Assistant minimized - click 📖 to expand";
+}
+
+/* Bottom Panel */
+.bottom-panel {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 150px;
+  max-height: 500px;
+}
+
+.panel-tabs {
+  display: flex;
+  gap: 1px;
+}
+
+.panel-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: var(--bg-tertiary);
+  color: #969696;
+  cursor: pointer;
+  font-size: 12px;
+  border-top: 2px solid transparent;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.panel-tab:hover {
+  color: var(--text-secondary);
+  background-color: #333333;
+}
+
+.panel-tab.active {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-top-color: var(--primary-color);
+}
+
+/* Center Content */
+.center-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 300px;
+}
+
+.editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-tabs {
+  display: flex;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  height: 35px;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.editor-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 100%;
+  background-color: var(--bg-tertiary);
+  color: #969696;
+  cursor: pointer;
+  border-right: 1px solid var(--border-color);
+  font-size: 13px;
+  position: relative;
+  transition: all 0.2s;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.editor-tab:hover {
+  color: var(--text-secondary);
+  background-color: #333333;
+}
+
+.editor-tab.active {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.tab-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.tab-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-close {
+  margin-left: 4px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.tab-close:hover {
+  background-color: #3e3e42;
+}
+
+.editor-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Resizers */
+.resizer {
+  background-color: transparent;
+  position: relative;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.vertical-resizer {
+  width: 4px;
+  cursor: ew-resize;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  background-color: var(--border-color);
+}
+
+.vertical-resizer:hover,
+.vertical-resizer:active {
+  background-color: var(--primary-color);
+}
+
+.horizontal-resizer {
+  height: 4px;
+  cursor: ns-resize;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--border-color);
+}
+
+.horizontal-resizer:hover,
+.horizontal-resizer:active {
+  background-color: var(--primary-color);
+}
+
+/* Floating Actions */
+.floating-actions {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.floating-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.floating-btn:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.floating-btn:active {
+  transform: scale(1.05);
+}
+
+/* AI Chat Button Special Styling */
+.floating-btn.chat-btn {
+  width: 80px;
+  height: 50px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #007acc, #0056b3);
+  font-size: 14px;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.floating-btn.chat-btn:hover {
+  background: linear-gradient(135deg, #1177bb, #007acc);
+  transform: scale(1.05);
+}
+
+/* Pulse Animation for AI Button */
+.floating-btn.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(0, 122, 204, 0.6);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+  }
+}
+
+.chat-btn {
+  background-color: #7c3aed;
+}
+
+.chat-btn:hover {
+  background-color: #8b5cf6;
+}
+
+.terminal-btn {
+  background-color: #059669;
+}
+
+.terminal-btn:hover {
+  background-color: #10b981;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .left-panel {
+    width: 250px !important;
+  }
+  
+  .right-panel {
+    width: 300px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-actions {
+    gap: 4px;
+  }
+  
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  .board-select,
+  .port-select {
+    min-width: 80px;
+    font-size: 11px;
+  }
+  
+  .floating-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
+  }
+  
+  .tab-name {
+    max-width: 80px;
+  }
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f4f4f;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg-primary);
+}
+
+/* Selection */
+::selection {
+  background-color: #264f78;
+  color: var(--text-primary);
+}
+
+/* Focus Styles */
+button:focus,
+select:focus {
+  outline: 1px solid var(--primary-color);
+  outline-offset: -1px;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.left-panel,
+.right-panel,
+.bottom-panel {
+  animation: slideIn 0.25s ease-out;
+}
+
+.editor-tab,
+.panel-tab {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Loading and transition states */
+.panel-content:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #969696;
+  font-style: italic;
+}
+
+.panel-content:empty::after {
+  content: "Loading...";
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .vscode-layout {
+    --border-color: #ffffff;
+    --text-secondary: #ffffff;
+  }
+  
+  .action-btn,
+  .floating-btn {
+    border: 2px solid #ffffff;
+  }
+}
+
+/* Arduino IDE Menu Dropdown Styles */
+.arduino-menu {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.menu-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: #d4d4d4;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-btn:hover {
+  background: #484848;
+  color: #e0e0e0;
+}
+
+.menu-btn.active {
+  background: #094771;
+  color: #ffffff;
+}
+
+.dropdown-content {
+  position: absolute;
+  background: #252526;
+  min-width: 200px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  border: 1px solid #444;
+  border-radius: 4px;
+  top: 100%;
+  left: 0;
+  margin-top: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.dropdown-content.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-content button {
+  background: none;
+  border: none;
+  color: #d4d4d4;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-content button:hover {
+  background: #094771;
+  color: #e0e0e0;
+}
+
+.menu-icon {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+}
+
+.menu-separator {
+  height: 1px;
+  background: #444;
+  margin: 4px 0;
+}
+
+/* Embedded Components Styles */
+.embedded-plotter,
+.embedded-console {
+  height: 100%;
+  overflow: hidden;
+}
+
+.embedded-plotter .serial-plotter,
+.embedded-console .output-console {
+  border: none;
+  border-radius: 0;
+  height: 100%;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* Prevent layout shifts and overlaps */
+.arduino-menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 1001;
+  position: relative;
+}
+
+/* Ensure dropdown content stays within viewport */
+.dropdown-content {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Prevent content from flowing under dropdowns */
+.main-layout-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure modals are above everything */
+.modal-overlay * {
+  z-index: inherit;
+}

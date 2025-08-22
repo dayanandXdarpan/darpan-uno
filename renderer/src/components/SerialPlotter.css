@@ -1,0 +1,391 @@
+/* Serial Plotter Styles */
+.serial-plotter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.serial-plotter {
+  background: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  width: 95%;
+  max-width: 1400px;
+  height: 90%;
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: #d4d4d4;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.plotter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #444;
+  background: linear-gradient(135deg, #2d2d30, #252526);
+}
+
+.plotter-header h2 {
+  margin: 0;
+  color: #e0e0e0;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #cccccc;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #ff4444;
+  color: white;
+}
+
+.plotter-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #444;
+  background: #252526;
+}
+
+.connection-controls,
+.plot-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.port-section,
+.baud-section,
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.port-section label,
+.baud-section label,
+.control-group label {
+  color: #cccccc;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.port-select,
+.baud-select,
+.number-input {
+  padding: 6px 10px;
+  background: #3c3c3c;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.port-select:focus,
+.baud-select:focus,
+.number-input:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.number-input {
+  width: 80px;
+}
+
+.connect-btn,
+.run-btn,
+.clear-btn,
+.export-btn {
+  background: #0e639c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.connect-btn:hover:not(:disabled),
+.run-btn:hover:not(:disabled),
+.clear-btn:hover,
+.export-btn:hover {
+  background: #1177bb;
+}
+
+.connect-btn.connected {
+  background: #dc2626;
+}
+
+.connect-btn.connected:hover {
+  background: #b91c1c;
+}
+
+.run-btn.running {
+  background: #f59e0b;
+}
+
+.run-btn.running:hover {
+  background: #d97706;
+}
+
+.clear-btn {
+  background: #dc2626;
+}
+
+.clear-btn:hover {
+  background: #b91c1c;
+}
+
+.export-btn {
+  background: #16a34a;
+}
+
+.export-btn:hover {
+  background: #15803d;
+}
+
+.connect-btn:disabled,
+.run-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.control-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.control-group input[type="checkbox"] {
+  margin: 0;
+}
+
+.plotter-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.plot-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+.plot-svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.empty-plot {
+  text-align: center;
+  color: #888;
+  padding: 40px;
+}
+
+.empty-plot p {
+  margin: 10px 0;
+}
+
+.empty-plot p:first-child {
+  font-size: 1.2em;
+  color: #aaa;
+}
+
+.legend {
+  width: 200px;
+  padding: 20px;
+  background: #252526;
+  border-left: 1px solid #444;
+  overflow-y: auto;
+}
+
+.legend h4 {
+  margin: 0 0 15px 0;
+  color: #e0e0e0;
+  font-size: 1.1em;
+  border-bottom: 1px solid #444;
+  padding-bottom: 8px;
+}
+
+.legend-item {
+  margin-bottom: 12px;
+}
+
+.legend-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #d4d4d4;
+}
+
+.legend-item input[type="checkbox"] {
+  margin: 0;
+}
+
+.color-indicator {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.plotter-status {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid #444;
+  background: #252526;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #888;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-indicator.connected {
+  background: #16a34a;
+  box-shadow: 0 0 6px rgba(22, 163, 74, 0.5);
+}
+
+.status-indicator.disconnected {
+  background: #dc2626;
+}
+
+/* Grid and axis styling */
+.grid line {
+  stroke: #444;
+  stroke-width: 1;
+  opacity: 0.3;
+}
+
+.axes line {
+  stroke: #666;
+  stroke-width: 2;
+}
+
+.axes text {
+  fill: #ccc;
+  font-size: 12px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .serial-plotter {
+    width: 98%;
+    height: 95%;
+  }
+  
+  .plotter-content {
+    flex-direction: column;
+  }
+  
+  .legend {
+    width: 100%;
+    max-height: 150px;
+    border-left: none;
+    border-top: 1px solid #444;
+  }
+  
+  .legend-item {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .connection-controls,
+  .plot-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .plotter-status {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .plot-svg {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Scrollbar Styling */
+.legend::-webkit-scrollbar {
+  width: 6px;
+}
+
+.legend::-webkit-scrollbar-track {
+  background: #2d2d30;
+}
+
+.legend::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.legend::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Animation for plot lines */
+.plot-svg path {
+  transition: opacity 0.2s ease;
+}
+
+.plot-svg path:hover {
+  opacity: 1 !important;
+  stroke-width: 3;
+}

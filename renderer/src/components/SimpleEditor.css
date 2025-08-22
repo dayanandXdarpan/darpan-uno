@@ -1,0 +1,402 @@
+.simple-editor {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #2d2d30;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-name {
+  font-weight: 500;
+}
+
+.language-badge {
+  background: #0e639c;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.editor-btn {
+  background: #0e639c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.editor-btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.editor-btn:hover {
+  background: #1177bb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 99, 156, 0.3);
+}
+
+.editor-btn:hover:before {
+  opacity: 1;
+}
+
+.editor-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(14, 99, 156, 0.2);
+}
+
+.editor-btn.secondary {
+  background: #3c3c3c;
+  color: #cccccc;
+  border: 1px solid #5a5a5a;
+}
+
+.editor-btn.secondary:hover {
+  background: #464647;
+  border-color: #6a6a6a;
+}
+
+.editor-btn .icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Split Editor Styles */
+.editor-content.split {
+  flex-direction: column;
+}
+
+.editor-pane {
+  flex: 1;
+  display: flex;
+  min-height: 200px;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.editor-pane:last-child {
+  border-bottom: none;
+}
+
+.split-handle {
+  height: 4px;
+  background: #3e3e42;
+  cursor: row-resize;
+  transition: background-color 0.2s ease;
+}
+
+.split-handle:hover {
+  background: #0e639c;
+}
+
+.editor-tabs {
+  display: flex;
+  background: #2d2d30;
+  border-bottom: 1px solid #3e3e42;
+  overflow-x: auto;
+}
+
+.editor-tab {
+  padding: 8px 16px;
+  background: #3c3c3c;
+  border: none;
+  border-right: 1px solid #3e3e42;
+  color: #cccccc;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.editor-tab:hover {
+  background: #464647;
+  color: #ffffff;
+}
+
+.editor-tab.active {
+  background: #1e1e1e;
+  color: #ffffff;
+  border-bottom: 2px solid #0e639c;
+}
+
+.editor-tab .close-btn {
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #858585;
+  cursor: pointer;
+}
+
+.editor-tab:hover .close-btn {
+  opacity: 1;
+}
+
+.editor-tab .close-btn:hover {
+  color: #ff6b6b;
+}
+
+/* Find/Replace Modal */
+.find-replace-modal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.find-replace-content {
+  background: #2d2d30;
+  border: 1px solid #3e3e42;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.find-replace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.find-replace-header h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #858585;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #ff6b6b;
+  color: #ffffff;
+}
+
+.find-replace-body {
+  padding: 16px;
+}
+
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  display: block;
+  color: #cccccc;
+  font-size: 12px;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.input-group input {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid #3e3e42;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #d4d4d4;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: #0e639c;
+  box-shadow: 0 0 0 2px rgba(14, 99, 156, 0.2);
+}
+
+.find-replace-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.find-replace-actions .editor-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.editor-content {
+  flex: 1;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+.line-numbers {
+  background: #2d2d30;
+  color: #858585;
+  padding: 10px 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  min-width: 50px;
+  text-align: right;
+  user-select: none;
+  border-right: 1px solid #3e3e42;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.line-number {
+  height: 19.5px;
+  padding-right: 4px;
+}
+
+.code-textarea {
+  flex: 1;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: none;
+  outline: none;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: none;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow: auto;
+  tab-size: 2;
+  scrollbar-width: thin;
+  scrollbar-color: #424242 #1e1e1e;
+}
+
+.code-textarea::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.code-textarea::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.code-textarea::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 6px;
+  border: 2px solid #1e1e1e;
+}
+
+.code-textarea::-webkit-scrollbar-thumb:hover {
+  background: #525252;
+}
+
+.code-textarea::-webkit-scrollbar-corner {
+  background: #1e1e1e;
+}
+
+.code-textarea:focus {
+  background: #1e1e1e;
+}
+
+.editor-footer {
+  padding: 4px 16px;
+  background: #2d2d30;
+  border-top: 1px solid #3e3e42;
+  font-size: 11px;
+}
+
+.status-info {
+  display: flex;
+  gap: 16px;
+  color: #cccccc;
+}
+
+.simple-editor.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loading-message {
+  color: #cccccc;
+  font-style: italic;
+}
+
+/* Syntax highlighting for basic keywords */
+.code-textarea {
+  color: #d4d4d4;
+}
+
+/* Add some basic syntax highlighting simulation */
+.code-textarea:focus {
+  background: #1e1e1e;
+  border: 1px solid #0e639c;
+  margin: -1px;
+}
